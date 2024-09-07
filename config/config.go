@@ -34,7 +34,5 @@ func GetDB() *sql.DB {
 		log.Fatalf("Lost connection with database: %s", err.Error())
 	}
 
-	log.Println("Still have connection with db", db)
-
 	return db
 }

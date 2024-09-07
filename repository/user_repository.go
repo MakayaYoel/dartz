@@ -9,18 +9,81 @@ import (
 )
 
 // CreateUser inserts a new user into the database. It returns an error if the attempt rendered unsuccessful.
-func CreateUser(u models.User) error {
+func CreateUser(u models.User) (models.User, error) {
 	db := config.GetDB()
 
 	stmt, err := db.Prepare(queries.CreateUser)
 	if err != nil {
-		return fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
 	}
 
 	_, err = stmt.Exec(u.Username, u.Email, u.Password)
 	if err != nil {
-		return fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
 	}
 
-	return nil
+	// Get user model struct (with ID field)
+	user, err := GetUserByUsername(u.Username)
+	if err != nil {
+		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+	}
+
+	return user, nil
+}
+
+// GetUserByUsername returns the specified user's model struct. It returns an error if the attempt rendered unsuccessful.
+func GetUserByUsername(username string) (models.User, error) {
+	db := config.GetDB()
+
+	stmt, err := db.Prepare(queries.GetUserByUsername)
+	if err != nil {
+		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by username: %s", err.Error())
+	}
+
+	var user models.User
+
+	err = stmt.QueryRow(username).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+	if err != nil {
+		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by username: %s", err.Error())
+	}
+
+	return user, nil
+}
+
+// CheckUsernameExists returns whether the specified username already exists in the DB. It returns an error if the attempt rendered unsuccessful.
+func CheckUsernameExists(username string) (bool, error) {
+	db := config.GetDB()
+
+	stmt, err := db.Prepare(queries.CheckExistingUsername)
+	if err != nil {
+		return false, fmt.Errorf("ran into an error trying to verify if username exists: %s", err.Error())
+	}
+
+	var count int
+
+	err = stmt.QueryRow(username).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("ran into an error trying to verify if username exists: %s", err.Error())
+	}
+
+	return count != 0, nil
+}
+
+// CheckEmailExists returns whether the specified email already exists in the DB. It returns an error if the attempt rendered unsuccessful.
+func CheckEmailExists(email string) (bool, error) {
+	db := config.GetDB()
+
+	stmt, err := db.Prepare(queries.CheckExistingEmail)
+	if err != nil {
+		return false, fmt.Errorf("ran into an error trying to verify if email exists: %s", err.Error())
+	}
+
+	var count int
+
+	err = stmt.QueryRow(email).Scan(&count)
+	if err != nil {
+		return false, fmt.Errorf("ran into an error trying to verify if email exists: %s", err.Error())
+	}
+
+	return count != 0, nil
 }

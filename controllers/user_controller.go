@@ -12,7 +12,11 @@ import (
 )
 
 func RegisterUser(c *gin.Context) {
-	var userInput models.User
+	var userInput struct {
+		Username string `json:"username"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
 
 	// Bind JSON to struct
 	if err := c.ShouldBindJSON(&userInput); err != nil {
@@ -41,12 +45,15 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	if err := repository.CreateUser(userInput); err != nil {
+	// Insert user into database
+	user, err := repository.CreateUser(models.User{Username: userInput.Username, Email: userInput.Email, Password: userInput.Password})
+	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	c.IndentedJSON(http.StatusCreated, gin.H{"message": "user created successfully", "user": userInput})
+	// Return message with user struct (with ID field)
+	c.IndentedJSON(http.StatusCreated, gin.H{"message": "user created successfully", "user": user})
 }
 
 // isValidUsername validates the given username. It returns an error if the username isn't valid.
@@ -61,6 +68,15 @@ func isValidUsername(username string) error {
 		return fmt.Errorf("username length cannot be over %d characters", usernameMaxLength)
 	}
 
+	exists, err := repository.CheckUsernameExists(username)
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		return errors.New("that username is already being used")
+	}
+
 	return nil
 }
 
@@ -70,6 +86,15 @@ func isValidEmail(email string) (string, error) {
 
 	if err != nil {
 		return "", errors.New("invalid email address given")
+	}
+
+	exists, err := repository.CheckEmailExists(e.Address)
+	if err != nil {
+		return "", err
+	}
+
+	if exists {
+		return "", errors.New("that email address is already being used")
 	}
 
 	return e.Address, nil
