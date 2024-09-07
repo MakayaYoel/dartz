@@ -6,15 +6,13 @@ import (
 	"net/http"
 	"net/mail"
 
+	"github.com/MakayaYoel/dartz/models"
+	"github.com/MakayaYoel/dartz/repository"
 	"github.com/gin-gonic/gin"
 )
 
 func RegisterUser(c *gin.Context) {
-	var userInput struct {
-		Username string `json:"username"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var userInput models.User
 
 	// Bind JSON to struct
 	if err := c.ShouldBindJSON(&userInput); err != nil {
@@ -43,7 +41,12 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("\n\nValidated user:", userInput)
+	if err := repository.CreateUser(userInput); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusCreated, gin.H{"message": "user created successfully", "user": userInput})
 }
 
 // isValidUsername validates the given username. It returns an error if the username isn't valid.
