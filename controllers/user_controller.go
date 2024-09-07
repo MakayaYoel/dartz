@@ -16,13 +16,13 @@ func RegisterUser(c *gin.Context) {
 
 	// Bind JSON to struct
 	if err := c.ShouldBindJSON(&userInput); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": "could not process request"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request"})
 		return
 	}
 
 	// Validate username
 	if err := isValidUsername(userInput.Username); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
@@ -31,18 +31,18 @@ func RegisterUser(c *gin.Context) {
 	userInput.Email, err = isValidEmail(userInput.Email)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
 	// Validate password
 	if err := isValidPassword(userInput.Password); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
 	if err := repository.CreateUser(userInput); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
