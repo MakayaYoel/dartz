@@ -52,7 +52,7 @@ func RegisterUser(c *gin.Context) {
 		return
 	}
 
-	// Return message with user struct (with ID field)
+	// Return message with user struct (with ID field and hashed password)
 	c.IndentedJSON(http.StatusCreated, gin.H{"message": "user created successfully", "user": user})
 }
 
@@ -102,7 +102,7 @@ func isValidEmail(email string) (string, error) {
 
 // isValidPassword validates the given password. It returns an error if the password isn't valid.
 func isValidPassword(password string) error {
-	passwordMinLength, passwordMaxLength := 8, 48
+	passwordMinLength, passwordMaxLength := 8, 36
 
 	if len(password) < passwordMinLength {
 		return fmt.Errorf("password length has to be at least %d characters", passwordMinLength)

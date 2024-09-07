@@ -6,6 +6,7 @@ import (
 	"github.com/MakayaYoel/dartz/config"
 	"github.com/MakayaYoel/dartz/models"
 	"github.com/MakayaYoel/dartz/queries"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // CreateUser inserts a new user into the database. It returns an error if the attempt rendered unsuccessful.
@@ -17,12 +18,19 @@ func CreateUser(u models.User) (models.User, error) {
 		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
 	}
 
+	password, err := bcrypt.GenerateFromPassword([]byte(u.Password), 14)
+	if err != nil {
+		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+	}
+
+	u.Password = string(password)
+
 	_, err = stmt.Exec(u.Username, u.Email, u.Password)
 	if err != nil {
 		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
 	}
 
-	// Get user model struct (with ID field)
+	// Get user model struct (with ID field and hashed password)
 	user, err := GetUserByUsername(u.Username)
 	if err != nil {
 		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
