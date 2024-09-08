@@ -57,6 +57,7 @@ func RegisterUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusCreated, gin.H{"message": "user created successfully", "user": user})
 }
 
+// AuthenticateUser attempts to authenticate the user.
 func AuthenticateUser(c *gin.Context) {
 	var userInput struct {
 		UsernameOrEmail string `json:"username_or_email"`
