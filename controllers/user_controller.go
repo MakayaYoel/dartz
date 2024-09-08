@@ -11,6 +11,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// RegisterUser creates a user.
 func RegisterUser(c *gin.Context) {
 	var userInput struct {
 		Username string `json:"username"`
@@ -54,6 +55,27 @@ func RegisterUser(c *gin.Context) {
 
 	// Return message with user struct (with ID field and hashed password)
 	c.IndentedJSON(http.StatusCreated, gin.H{"message": "user created successfully", "user": user})
+}
+
+func AuthenticateUser(c *gin.Context) {
+	var userInput struct {
+		UsernameOrEmail string `json:"username_or_email"`
+		Password        string `json:"password"`
+	}
+
+	if err := c.ShouldBindJSON(&userInput); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request"})
+		return
+	}
+
+	user, err := repository.Authenticate(userInput)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully authenticated user", "user": user})
 }
 
 // isValidUsername validates the given username. It returns an error if the username isn't valid.
