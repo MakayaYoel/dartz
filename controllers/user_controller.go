@@ -76,6 +76,17 @@ func AuthenticateUser(c *gin.Context) {
 		return
 	}
 
+	jwtToken, err := repository.CreateJWTToken(user.Username)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("could not generate jwt authentication token: %s", err.Error())})
+		return
+	}
+
+	c.Request.Header.Add("Authorization", jwtToken)
+
+	fmt.Println("JWT Token:", jwtToken)
+
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully authenticated user", "user": user})
 }
 
