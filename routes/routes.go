@@ -10,7 +10,7 @@ func RegisterRoutes(router *gin.Engine) {
 	mainRouteGroup := router.Group("/api")
 	mainRouteGroup.Use(middleware.VerifyJWTAuthToken)
 
-	mainRouteGroup.GET("/test", func(ctx *gin.Context) {})
+	mainRouteGroup.GET("/tasks", controllers.GetAllTasks)
 
 	// Auth routes
 	router.POST("/register", controllers.RegisterUser)
