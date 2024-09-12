@@ -18,6 +18,7 @@ func VerifyJWTAuthToken(c *gin.Context) {
 
 	if token == "" {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": invalidToken.Error()})
+		c.Abort()
 		return
 	}
 
@@ -29,13 +30,15 @@ func VerifyJWTAuthToken(c *gin.Context) {
 
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": fmt.Sprintf("failed to verify jwt authentication token: %s", err.Error())})
+		c.Abort()
 		return
 	}
 
 	if !t.Valid {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": invalidToken.Error()})
+		c.Abort()
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "authorized"})
+	c.Next()
 }
