@@ -19,7 +19,13 @@ func LoadConfig() {
 	}
 
 	// Initialize tables
-	_, err = database.Exec(queries.CreateTables)
+	_, err = database.Exec(queries.CreateUsersTable)
+
+	if err != nil {
+		log.Fatalf("Could not initialize database tables: %s", err.Error())
+	}
+
+	_, err = database.Exec(queries.CreateTasksTable)
 
 	if err != nil {
 		log.Fatalf("Could not initialize database tables: %s", err.Error())
