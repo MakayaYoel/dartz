@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// GetAllTasks retrieves all tasks.
 func GetAllTasks(c *gin.Context) {
 	tasks, err := repository.GetTasks()
 

@@ -8,6 +8,7 @@ import (
 	"github.com/MakayaYoel/dartz/queries"
 )
 
+// GetTasks returns a slice containing all tasks. It returns an error if the attempt rendered unsuccessful.
 func GetTasks() ([]models.Task, error) {
 	db := config.GetDB()
 
