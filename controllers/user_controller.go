@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/mail"
 
+	"github.com/MakayaYoel/dartz/auth"
 	"github.com/MakayaYoel/dartz/models"
 	"github.com/MakayaYoel/dartz/repository"
 	"github.com/gin-gonic/gin"
@@ -76,7 +77,7 @@ func AuthenticateUser(c *gin.Context) {
 		return
 	}
 
-	jwtToken, err := repository.CreateJWTToken(user.Username)
+	jwtToken, err := auth.CreateJWTToken(user.Username)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("could not generate jwt authentication token: %s", err.Error())})
