@@ -35,15 +35,11 @@ func GetTasks() ([]models.Task, error) {
 func GetTaskByID(taskID int) (models.Task, error) {
 	db := config.GetDB()
 
-	rows, err := db.Query(queries.GetTaskByID)
-
-	if err != nil {
-		return models.Task{}, fmt.Errorf("ran into an error trying to fetch task by ID: %s", err.Error())
-	}
+	rows := db.QueryRow(queries.GetTaskByID, taskID)
 
 	var task models.Task
 
-	err = rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDate)
+	err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDate)
 
 	if err != nil {
 		return models.Task{}, fmt.Errorf("ran into an error trying to fetch task by ID: %s", err.Error())

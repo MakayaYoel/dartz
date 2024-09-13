@@ -11,7 +11,7 @@ func RegisterRoutes(router *gin.Engine) {
 	mainRouteGroup.Use(middleware.VerifyJWTAuthToken)
 
 	mainRouteGroup.GET("/tasks", controllers.GetAllTasks)
-	mainRouteGroup.GET("/task/:id", controllers.GetTask)
+	mainRouteGroup.GET("/tasks/:id", controllers.GetTask)
 
 	// Auth routes
 	router.POST("/register", controllers.RegisterUser)

@@ -26,7 +26,7 @@ func GetAllTasks(c *gin.Context) {
 }
 
 func GetTask(c *gin.Context) {
-	rawID := c.Query("id")
+	rawID := c.Param("id")
 	intID, err := strconv.Atoi(rawID)
 
 	if err != nil {
@@ -37,7 +37,7 @@ func GetTask(c *gin.Context) {
 	task, err := repository.GetTaskByID(intID)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "ran into an error trying to fetch a task by its ID"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
