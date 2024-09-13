@@ -10,4 +10,5 @@ const (
 	CheckExistingUsername = "SELECT COUNT(*) FROM users WHERE username = LOWER(?)"
 	CheckExistingEmail    = "SELECT COUNT(*) FROM users WHERE email = LOWER(?)"
 	GetAllTasks           = "SELECT * FROM tasks"
+	GetTaskByID           = "SELECT * FROM tasks WHERE id = ?"
 )
