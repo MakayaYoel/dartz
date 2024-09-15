@@ -43,3 +43,26 @@ func GetTask(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, gin.H{"task": task})
 }
+
+func CreateTask(c *gin.Context) {
+	var userInput struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Priority    uint8  `json:"priority"`
+		DueDate     int    `json:"due_date"`
+	}
+
+	if err := c.ShouldBindJSON(&userInput); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request."})
+		return
+	}
+
+	err := repository.AddTask(userInput)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "created task successfully."})
+}

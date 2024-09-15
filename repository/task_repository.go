@@ -47,3 +47,32 @@ func GetTaskByID(taskID int) (models.Task, error) {
 
 	return task, nil
 }
+
+func AddTask(userInput interface{}) error {
+	uInput, ok := userInput.(struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Priority    uint8  `json:"priority"`
+		DueDate     int    `json:"due_date"`
+	})
+
+	if !ok {
+		return fmt.Errorf("could not process user input when trying to add task")
+	}
+
+	db := config.GetDB()
+
+	stmt, err := db.Prepare(queries.AddTask)
+
+	if err != nil {
+		return fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
+	}
+
+	_, err = stmt.Exec(uInput.Title, uInput.Description, uInput.Priority, uInput.DueDate)
+
+	if err != nil {
+		return fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
+	}
+
+	return nil
+}

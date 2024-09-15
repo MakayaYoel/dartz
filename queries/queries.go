@@ -11,4 +11,5 @@ const (
 	CheckExistingEmail    = "SELECT COUNT(*) FROM users WHERE email = LOWER(?)"
 	GetAllTasks           = "SELECT * FROM tasks"
 	GetTaskByID           = "SELECT * FROM tasks WHERE id = ?"
+	AddTask               = "INSERT INTO tasks(title, description, priority, due_date) VALUES(?, ?, ?, ?)"
 )

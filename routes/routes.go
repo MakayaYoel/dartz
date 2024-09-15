@@ -12,6 +12,7 @@ func RegisterRoutes(router *gin.Engine) {
 
 	mainRouteGroup.GET("/tasks", controllers.GetAllTasks)
 	mainRouteGroup.GET("/tasks/:id", controllers.GetTask)
+	mainRouteGroup.POST("/tasks", controllers.CreateTask)
 
 	// Auth routes
 	router.POST("/register", controllers.RegisterUser)
