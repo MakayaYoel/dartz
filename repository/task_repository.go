@@ -46,8 +46,8 @@ func GetTaskByID(taskID int) (models.Task, error) {
 	return task, nil
 }
 
-func AddTask(userInput interface{}) (models.Task, error) {
-	uInput, ok := userInput.(struct {
+func AddTask(d interface{}) (models.Task, error) {
+	userInput, ok := d.(struct {
 		Title       string `json:"title"`
 		Description string `json:"description"`
 		Priority    uint8  `json:"priority"`
@@ -65,7 +65,7 @@ func AddTask(userInput interface{}) (models.Task, error) {
 		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
 	}
 
-	res, err := stmt.Exec(uInput.Title, uInput.Description, uInput.Priority, uInput.DueDate)
+	res, err := stmt.Exec(userInput.Title, userInput.Description, userInput.Priority, userInput.DueDate)
 	if err != nil {
 		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
 	}
