@@ -57,12 +57,12 @@ func CreateTask(c *gin.Context) {
 		return
 	}
 
-	err := repository.AddTask(userInput)
+	task, err := repository.AddTask(userInput)
 
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "created task successfully."})
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "created task successfully.", "task": task})
 }
