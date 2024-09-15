@@ -35,7 +35,6 @@ func GetTask(c *gin.Context) {
 	}
 
 	task, err := repository.GetTaskByID(intID)
-
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
@@ -58,7 +57,6 @@ func CreateTask(c *gin.Context) {
 	}
 
 	task, err := repository.AddTask(userInput)
-
 	if err != nil {
 		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return

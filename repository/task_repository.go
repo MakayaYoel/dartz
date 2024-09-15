@@ -15,7 +15,6 @@ func GetTasks() ([]models.Task, error) {
 	var tasks []models.Task
 
 	res, err := db.Query(queries.GetAllTasks)
-
 	if err != nil {
 		return tasks, fmt.Errorf("ran into an error trying to retrieve all tasks: %s", err.Error())
 	}
@@ -40,7 +39,6 @@ func GetTaskByID(taskID int) (models.Task, error) {
 	var task models.Task
 
 	err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDate)
-
 	if err != nil {
 		return models.Task{}, fmt.Errorf("ran into an error trying to fetch task by ID: %s", err.Error())
 	}
@@ -63,25 +61,21 @@ func AddTask(userInput interface{}) (models.Task, error) {
 	db := config.GetDB()
 
 	stmt, err := db.Prepare(queries.AddTask)
-
 	if err != nil {
 		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
 	}
 
 	res, err := stmt.Exec(uInput.Title, uInput.Description, uInput.Priority, uInput.DueDate)
-
 	if err != nil {
 		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
 	}
 
 	insertID, err := res.LastInsertId()
-
 	if err != nil {
 		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
 	}
 
 	task, err := GetTaskByID(int(insertID))
-
 	if err != nil {
 		return models.Task{}, err
 	}
