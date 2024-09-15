@@ -25,13 +25,18 @@ func CreateUser(u models.User) (models.User, error) {
 
 	u.Password = string(password)
 
-	_, err = stmt.Exec(u.Username, u.Email, u.Password)
+	res, err := stmt.Exec(u.Username, u.Email, u.Password)
+	if err != nil {
+		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+	}
+
+	insertID, err := res.LastInsertId()
 	if err != nil {
 		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
 	}
 
 	// Get user model struct (with ID field and hashed password)
-	user, err := GetUserByUsername(u.Username)
+	user, err := GetUserByID(int(insertID))
 	if err != nil {
 		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
 	}
@@ -101,7 +106,26 @@ func GetUserByEmail(email string) (models.User, error) {
 
 	err = stmt.QueryRow(email).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by username: %s", err.Error())
+		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by email: %s", err.Error())
+	}
+
+	return user, nil
+}
+
+// GetUserByID returns the specified user's model struct. It returns an error if the attempt rendered unsuccessful.
+func GetUserByID(id int) (models.User, error) {
+	db := config.GetDB()
+
+	stmt, err := db.Prepare(queries.GetUserByID)
+	if err != nil {
+		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by id: %s", err.Error())
+	}
+
+	var user models.User
+
+	err = stmt.QueryRow(id).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
+	if err != nil {
+		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by id: %s", err.Error())
 	}
 
 	return user, nil
