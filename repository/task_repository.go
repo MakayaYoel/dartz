@@ -46,6 +46,7 @@ func GetTaskByID(taskID int) (models.Task, error) {
 	return task, nil
 }
 
+// AddTask creates a task and returns it.
 func AddTask(d interface{}) (models.Task, error) {
 	userInput, ok := d.(struct {
 		Title       string `json:"title"`

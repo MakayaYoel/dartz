@@ -25,6 +25,7 @@ func GetAllTasks(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"tasks": tasks})
 }
 
+// GetTask retrieves the specified task.
 func GetTask(c *gin.Context) {
 	rawID := c.Param("id")
 	intID, err := strconv.Atoi(rawID)
@@ -43,6 +44,7 @@ func GetTask(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"task": task})
 }
 
+// CreateTask creates a new task.
 func CreateTask(c *gin.Context) {
 	var userInput struct {
 		Title       string `json:"title"`
