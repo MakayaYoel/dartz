@@ -83,3 +83,36 @@ func AddTask(d interface{}) (models.Task, error) {
 
 	return task, nil
 }
+
+// UpdateTask updates the specified task.
+func UpdateTask(ID int, d interface{}) (models.Task, error) {
+	userInput, ok := d.(struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Priority    uint8  `json:"priority"`
+		DueDate     int    `json:"due_date"`
+	})
+
+	if !ok {
+		return models.Task{}, fmt.Errorf("could not process user input when trying to add task")
+	}
+
+	db := config.GetDB()
+
+	stmt, err := db.Prepare(queries.UpdateTask)
+	if err != nil {
+		return models.Task{}, fmt.Errorf("ran into an error trying to update a task: %s", err.Error())
+	}
+
+	_, err = stmt.Exec(ID, userInput.Title, userInput.Description, userInput.Priority, userInput.DueDate)
+	if err != nil {
+		return models.Task{}, fmt.Errorf("ran into an error trying to update a task: %s", err.Error())
+	}
+
+	task, err := GetTaskByID(ID)
+	if err != nil {
+		return models.Task{}, err
+	}
+
+	return task, nil
+}

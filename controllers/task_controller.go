@@ -66,3 +66,32 @@ func CreateTask(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "created task successfully.", "task": task})
 }
+
+func UpdateTask(c *gin.Context) {
+	var userInput struct {
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Priority    uint8  `json:"priority"`
+		DueDate     int    `json:"due_date"`
+	}
+
+	if err := c.ShouldBindJSON(&userInput); err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request."})
+		return
+	}
+
+	rawID := c.Param("id")
+	intID, err := strconv.Atoi(rawID)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request."})
+		return
+	}
+
+	task, err := repository.UpdateTask(intID, userInput)
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully updated task.", "task": task})
+}
