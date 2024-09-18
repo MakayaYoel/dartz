@@ -117,19 +117,20 @@ func UpdateTask(ID int, d interface{}) (models.Task, error) {
 	return task, nil
 }
 
+// DeleteTask deletes a task.
 func DeleteTask(task models.Task) error {
 	db := config.GetDB()
 
 	stmt, err := db.Prepare(queries.DeleteTask)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("ran into an error trying to delete a task: %s", err.Error())
 	}
 
 	_, err = stmt.Exec(task.ID)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("ran into an error trying to delete a task: %s", err.Error())
 	}
 
 	return nil

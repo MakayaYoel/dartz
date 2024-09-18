@@ -67,6 +67,7 @@ func CreateTask(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "created task successfully.", "task": task})
 }
 
+// UpdateTask updates the specified task.
 func UpdateTask(c *gin.Context) {
 	var userInput struct {
 		Title       string `json:"title"`
@@ -96,6 +97,7 @@ func UpdateTask(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully updated task.", "task": task})
 }
 
+// DeleteTask deletes the specified task.
 func DeleteTask(c *gin.Context) {
 	rawID := c.Param("id")
 	intID, err := strconv.Atoi(rawID)
