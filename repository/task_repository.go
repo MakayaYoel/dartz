@@ -116,3 +116,21 @@ func UpdateTask(ID int, d interface{}) (models.Task, error) {
 
 	return task, nil
 }
+
+func DeleteTask(task models.Task) error {
+	db := config.GetDB()
+
+	stmt, err := db.Prepare(queries.DeleteTask)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(task.ID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

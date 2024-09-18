@@ -13,4 +13,5 @@ const (
 	GetTaskByID           = "SELECT * FROM tasks WHERE id = ?"
 	AddTask               = "INSERT INTO tasks(title, description, priority, due_date) VALUES(?, ?, ?, ?)"
 	UpdateTask            = "REPLACE INTO tasks(id, title, description, priority, due_date) VALUES(?, ?, ?, ?, ?)"
+	DeleteTask            = "DELETE * FROM tasks WHERE id = ?"
 )

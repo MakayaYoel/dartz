@@ -16,6 +16,7 @@ func RegisterRoutes(router *gin.Engine) {
 
 	mainRouteGroup.GET("/tasks/:id", controllers.GetTask)
 	mainRouteGroup.PUT("/tasks/:id", controllers.UpdateTask)
+	mainRouteGroup.DELETE("/tasks/:id")
 
 	// Auth Routes
 	router.POST("/register", controllers.RegisterUser)

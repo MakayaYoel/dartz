@@ -95,3 +95,29 @@ func UpdateTask(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully updated task.", "task": task})
 }
+
+func DeleteTask(c *gin.Context) {
+	rawID := c.Param("id")
+	intID, err := strconv.Atoi(rawID)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request."})
+		return
+	}
+
+	task, err := repository.GetTaskByID(intID)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	err = repository.DeleteTask(task)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully deleted task."})
+}
