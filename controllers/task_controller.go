@@ -3,7 +3,9 @@ package controllers
 import (
 	"net/http"
 	"strconv"
+	"time"
 
+	"github.com/MakayaYoel/dartz/models"
 	"github.com/MakayaYoel/dartz/repository"
 	"github.com/gin-gonic/gin"
 )
@@ -22,7 +24,13 @@ func GetAllTasks(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"tasks": tasks})
+	var cleanTasks []map[string]interface{}
+
+	for _, t := range tasks {
+		cleanTasks = append(cleanTasks, cleanTaskStruct(t))
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"tasks": cleanTasks})
 }
 
 // GetTask retrieves the specified task.
@@ -41,7 +49,7 @@ func GetTask(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"task": task})
+	c.IndentedJSON(http.StatusOK, gin.H{"task": cleanTaskStruct(task)})
 }
 
 // CreateTask creates a new task.
@@ -64,7 +72,7 @@ func CreateTask(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "created task successfully.", "task": task})
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "created task successfully.", "task": cleanTaskStruct(task)})
 }
 
 // UpdateTask updates the specified task.
@@ -94,7 +102,7 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully updated task.", "task": task})
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully updated task.", "task": cleanTaskStruct(task)})
 }
 
 // DeleteTask deletes the specified task.
@@ -122,4 +130,28 @@ func DeleteTask(c *gin.Context) {
 	}
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully deleted task."})
+}
+
+func cleanTaskStruct(t models.Task) map[string]interface{} {
+	tm := time.Unix(int64(t.DueDate), 0)
+
+	var priority string
+	switch t.Priority {
+	case 0:
+		priority = "Low"
+	case 1:
+		priority = "Medium"
+	case 2:
+		priority = "Urgent"
+	default:
+		priority = "N/A"
+	}
+
+	return map[string]interface{}{
+		"id":          t.ID,
+		"title":       t.Title,
+		"description": t.Description,
+		"priority":    priority,
+		"due_date":    tm.Format("Monday, January 02, 2006"),
+	}
 }
