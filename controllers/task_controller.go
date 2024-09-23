@@ -58,7 +58,8 @@ func CreateTask(c *gin.Context) {
 		Title       string `json:"title"`
 		Description string `json:"description"`
 		Priority    uint8  `json:"priority"`
-		DueDate     int    `json:"due_date"`
+		CreatedAt   int    `json:"created_at"`
+		Completed   bool   `json:"completed"`
 	}
 
 	if err := c.ShouldBindJSON(&userInput); err != nil {
@@ -81,7 +82,8 @@ func UpdateTask(c *gin.Context) {
 		Title       string `json:"title"`
 		Description string `json:"description"`
 		Priority    uint8  `json:"priority"`
-		DueDate     int    `json:"due_date"`
+		CreatedAt   int    `json:"created_at"`
+		Completed   bool   `json:"completed"`
 	}
 
 	if err := c.ShouldBindJSON(&userInput); err != nil {
@@ -133,7 +135,7 @@ func DeleteTask(c *gin.Context) {
 }
 
 func cleanTaskStruct(t models.Task) map[string]interface{} {
-	tm := time.Unix(int64(t.DueDate), 0)
+	tm := time.Unix(int64(t.CreatedAt), 0)
 
 	var priority string
 	switch t.Priority {
@@ -152,6 +154,7 @@ func cleanTaskStruct(t models.Task) map[string]interface{} {
 		"title":       t.Title,
 		"description": t.Description,
 		"priority":    priority,
-		"due_date":    tm.Format("Monday, January 02, 2006"),
+		"created_at":  tm.Format("Monday, January 02, 2006"),
+		"completed":   t.Completed,
 	}
 }

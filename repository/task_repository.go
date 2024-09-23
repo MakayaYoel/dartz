@@ -22,7 +22,7 @@ func GetTasks() ([]models.Task, error) {
 	for res.Next() {
 		var row models.Task
 
-		res.Scan(&row.ID, &row.Title, &row.Description, &row.Priority, &row.DueDate)
+		res.Scan(&row.ID, &row.Title, &row.Description, &row.Priority, &row.CreatedAt, &row.Completed)
 
 		tasks = append(tasks, row)
 	}
@@ -38,7 +38,7 @@ func GetTaskByID(taskID int) (models.Task, error) {
 
 	var task models.Task
 
-	err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.DueDate)
+	err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.CreatedAt, &task.Completed)
 	if err != nil {
 		return models.Task{}, fmt.Errorf("ran into an error trying to fetch task by ID: %s", err.Error())
 	}
@@ -52,7 +52,8 @@ func AddTask(d interface{}) (models.Task, error) {
 		Title       string `json:"title"`
 		Description string `json:"description"`
 		Priority    uint8  `json:"priority"`
-		DueDate     int    `json:"due_date"`
+		CreatedAt   int    `json:"created_at"`
+		Completed   bool   `json:"completed"`
 	})
 
 	if !ok {
@@ -66,7 +67,7 @@ func AddTask(d interface{}) (models.Task, error) {
 		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
 	}
 
-	res, err := stmt.Exec(userInput.Title, userInput.Description, userInput.Priority, userInput.DueDate)
+	res, err := stmt.Exec(userInput.Title, userInput.Description, userInput.Priority, userInput.CreatedAt, userInput.Completed)
 	if err != nil {
 		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
 	}
@@ -90,7 +91,8 @@ func UpdateTask(ID int, d interface{}) (models.Task, error) {
 		Title       string `json:"title"`
 		Description string `json:"description"`
 		Priority    uint8  `json:"priority"`
-		DueDate     int    `json:"due_date"`
+		CreatedAt   int    `json:"created_at"`
+		Completed   bool   `json:"completed"`
 	})
 
 	if !ok {
@@ -104,7 +106,7 @@ func UpdateTask(ID int, d interface{}) (models.Task, error) {
 		return models.Task{}, fmt.Errorf("ran into an error trying to update a task: %s", err.Error())
 	}
 
-	_, err = stmt.Exec(ID, userInput.Title, userInput.Description, userInput.Priority, userInput.DueDate)
+	_, err = stmt.Exec(ID, userInput.Title, userInput.Description, userInput.Priority, userInput.CreatedAt, userInput.Completed)
 	if err != nil {
 		return models.Task{}, fmt.Errorf("ran into an error trying to update a task: %s", err.Error())
 	}
