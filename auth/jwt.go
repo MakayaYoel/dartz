@@ -7,7 +7,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecretKey = []byte("YourSecretKey")
+var JWTSecretKey []byte
 
 // CreateJWTToken creates a JWT Authentication Token for the specified username. It returns an error if a token could not be generated.
 func CreateJWTToken(username string) (string, error) {
@@ -19,7 +19,7 @@ func CreateJWTToken(username string) (string, error) {
 		},
 	)
 
-	tokenString, err := token.SignedString(jwtSecretKey)
+	tokenString, err := token.SignedString(JWTSecretKey)
 
 	if err != nil {
 		return "", fmt.Errorf("ran into an error trying to create a jwt token for %s: %s", username, err.Error())
@@ -39,7 +39,7 @@ func VerifyJWTToken(token string) error {
 	token = token[len("Bearer "):]
 
 	t, err := jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		return jwtSecretKey, nil
+		return JWTSecretKey, nil
 	})
 
 	if err != nil {
