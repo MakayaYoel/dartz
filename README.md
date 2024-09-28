@@ -1,21 +1,37 @@
 # dartz
 
-dartz is a task management REST API made with Golang and the Gin framework.
+dartz is a task management REST API built with Golang and the Gin framework.
 
 ## Features
-- **Authentication System:** Has an authentication system that utilizes JWT authentication tokens.
-- **Configurable:** You can easily input your database details and JWT secret key.
+
+- User registration and authentication system using JWT tokens
+- CRUD operations for tasks (Create, Read, Update, Delete)
+- Secure password hashing
+- MySQL database integration
 
 ## API Endpoints
-| Methods  | Endpoints | Description |
-| ------------- | ------------- | ------------- |
-| GET  | /api/tasks  | Returns all tasks  |
-| POST | /api/tasks  | Creates a task |
-| GET  | /api/tasks/{id} | Returns all information on the specified task |
-| PUT  | /api/tasks/{id} | Updates the specified task |
-| DELETE | /api/tasks/{id} | Deletes the specified task |
-| POST | /register | Creates a new user |
-| POST | /login | Authenticates a user |
-  
+
+| Method | Endpoint          | Description                    | Authentication Required |
+|--------|------------------ |------------------------------- |-------------------------|
+| POST   | /register         | Registers a new user           | No                      |
+| POST   | /login            | Authenticates a user           | No                      |
+| GET    | /api/tasks        | Retrieves all tasks            | Yes                     |
+| POST   | /api/tasks        | Creates a new task             | Yes                     |
+| GET    | /api/tasks/{id}   | Retrieves a specific task      | Yes                     |
+| PUT    | /api/tasks/{id}   | Updates a specific task        | Yes                     |
+| DELETE | /api/tasks/{id}   | Deletes a specific task        | Yes                     |
+
 ## Installation & Usage
-- Coming Soon
+
+1. Clone and navigate to the repository:
+```bash
+git clone https://github.com/MakayaYoel/dartz.git
+cd dartz
+```
+
+2. Rename the ``env.example`` file to ``.env``, then fill in your DB details as well as your JWT secret key.
+
+3. Start the server. The application will start at `http://localhost:8080`:
+```bash
+go run cmd/main.go
+```

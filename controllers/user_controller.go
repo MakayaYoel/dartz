@@ -84,9 +84,7 @@ func AuthenticateUser(c *gin.Context) {
 		return
 	}
 
-	c.Request.Header.Add("Authorization", jwtToken)
-
-	fmt.Println("JWT Token:", jwtToken)
+	c.Request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwtToken))
 
 	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully authenticated user", "user": user})
 }
