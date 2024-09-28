@@ -22,7 +22,7 @@ func RegisterUser(c *gin.Context) {
 
 	// Bind JSON to struct
 	if err := c.ShouldBindJSON(&userInput); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Could not process request."})
 		return
 	}
 
@@ -55,7 +55,7 @@ func RegisterUser(c *gin.Context) {
 	}
 
 	// Return message with user struct (with ID field and hashed password)
-	c.IndentedJSON(http.StatusCreated, gin.H{"message": "user created successfully", "user": user})
+	c.IndentedJSON(http.StatusCreated, gin.H{"message": "User created successfully.", "user": user})
 }
 
 // AuthenticateUser attempts to authenticate the user.
@@ -66,7 +66,7 @@ func AuthenticateUser(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&userInput); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request"})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Could not process request."})
 		return
 	}
 
@@ -80,13 +80,13 @@ func AuthenticateUser(c *gin.Context) {
 	jwtToken, err := auth.CreateJWTToken(user.Username)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusOK, gin.H{"message": fmt.Sprintf("could not generate jwt authentication token: %s", err.Error())})
+		c.IndentedJSON(http.StatusOK, gin.H{"message": err.Error()})
 		return
 	}
 
 	c.Request.Header.Add("Authorization", fmt.Sprintf("Bearer %s", jwtToken))
 
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully authenticated user", "user": user})
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Successfully authenticated user.", "user": user})
 }
 
 // isValidUsername validates the given username. It returns an error if the username isn't valid.
@@ -94,11 +94,11 @@ func isValidUsername(username string) error {
 	usernameMinLength, usernameMaxLength := 3, 24
 
 	if len(username) < usernameMinLength {
-		return fmt.Errorf("username length has to be at least %d characters", usernameMinLength)
+		return fmt.Errorf("Username length has to be at least %d characters.", usernameMinLength)
 	}
 
 	if len(username) > usernameMaxLength {
-		return fmt.Errorf("username length cannot be over %d characters", usernameMaxLength)
+		return fmt.Errorf("Username length cannot be over %d characters.", usernameMaxLength)
 	}
 
 	exists, err := repository.CheckUsernameExists(username)
@@ -107,7 +107,7 @@ func isValidUsername(username string) error {
 	}
 
 	if exists {
-		return errors.New("that username is already being used")
+		return errors.New("That username is already being used.")
 	}
 
 	return nil
@@ -118,7 +118,7 @@ func isValidEmail(email string) (string, error) {
 	e, err := mail.ParseAddress(email)
 
 	if err != nil {
-		return "", errors.New("invalid email address given")
+		return "", errors.New("Invalid email address given.")
 	}
 
 	exists, err := repository.CheckEmailExists(e.Address)
@@ -127,7 +127,7 @@ func isValidEmail(email string) (string, error) {
 	}
 
 	if exists {
-		return "", errors.New("that email address is already being used")
+		return "", errors.New("That email address is already being used.")
 	}
 
 	return e.Address, nil
@@ -138,11 +138,11 @@ func isValidPassword(password string) error {
 	passwordMinLength, passwordMaxLength := 8, 36
 
 	if len(password) < passwordMinLength {
-		return fmt.Errorf("password length has to be at least %d characters", passwordMinLength)
+		return fmt.Errorf("Password length has to be at least %d characters.", passwordMinLength)
 	}
 
 	if len(password) > passwordMaxLength {
-		return fmt.Errorf("password length cannot be over %d characters", passwordMaxLength)
+		return fmt.Errorf("Password length cannot be over %d characters.", passwordMaxLength)
 	}
 
 	return nil

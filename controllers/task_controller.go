@@ -39,7 +39,7 @@ func GetTask(c *gin.Context) {
 	intID, err := strconv.Atoi(rawID)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request."})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Could not process request."})
 		return
 	}
 
@@ -63,7 +63,7 @@ func CreateTask(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&userInput); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request."})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Could not process request."})
 		return
 	}
 
@@ -73,7 +73,7 @@ func CreateTask(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "created task successfully.", "task": cleanTaskStruct(task)})
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Created task successfully.", "task": cleanTaskStruct(task)})
 }
 
 // UpdateTask updates the specified task.
@@ -87,14 +87,14 @@ func UpdateTask(c *gin.Context) {
 	}
 
 	if err := c.ShouldBindJSON(&userInput); err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request."})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Could not process request."})
 		return
 	}
 
 	rawID := c.Param("id")
 	intID, err := strconv.Atoi(rawID)
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request."})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Could not process request."})
 		return
 	}
 
@@ -104,7 +104,7 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully updated task.", "task": cleanTaskStruct(task)})
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Successfully updated task.", "task": cleanTaskStruct(task)})
 }
 
 // DeleteTask deletes the specified task.
@@ -113,7 +113,7 @@ func DeleteTask(c *gin.Context) {
 	intID, err := strconv.Atoi(rawID)
 
 	if err != nil {
-		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "could not process request."})
+		c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Could not process request."})
 		return
 	}
 
@@ -131,7 +131,7 @@ func DeleteTask(c *gin.Context) {
 		return
 	}
 
-	c.IndentedJSON(http.StatusOK, gin.H{"message": "successfully deleted task."})
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Successfully deleted task."})
 }
 
 func cleanTaskStruct(t models.Task) map[string]interface{} {

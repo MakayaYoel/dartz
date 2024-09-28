@@ -15,30 +15,30 @@ func CreateUser(u models.User) (models.User, error) {
 
 	stmt, err := db.Prepare(queries.CreateUser)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+		return models.User{}, fmt.Errorf("Could not prepare SQL statement to create a user: %s.", err.Error())
 	}
 
 	password, err := bcrypt.GenerateFromPassword([]byte(u.Password), 14)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+		return models.User{}, fmt.Errorf("Could not hash password: %s.", err.Error())
 	}
 
 	u.Password = string(password)
 
 	res, err := stmt.Exec(u.Username, u.Email, u.Password)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+		return models.User{}, fmt.Errorf("Could not execute statement to create a user: %s.", err.Error())
 	}
 
 	insertID, err := res.LastInsertId()
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+		return models.User{}, fmt.Errorf("Could not retrieve insert ID: %s.", err.Error())
 	}
 
 	// Get user model struct (with ID field and hashed password)
 	user, err := GetUserByID(int(insertID))
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to create a user: %s", err.Error())
+		return models.User{}, err
 	}
 
 	return user, nil
@@ -52,14 +52,14 @@ func Authenticate(d interface{}) (models.User, error) {
 	})
 
 	if !ok {
-		return models.User{}, fmt.Errorf("cannot process user input")
+		return models.User{}, fmt.Errorf("Could not process user input.")
 	}
 
 	auth := func(u models.User) (models.User, error) {
 		err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(userInput.Password))
 
 		if err != nil {
-			return models.User{}, fmt.Errorf("invalid credentials")
+			return models.User{}, fmt.Errorf("Invalid credentials.")
 		}
 
 		return u, nil
@@ -71,7 +71,7 @@ func Authenticate(d interface{}) (models.User, error) {
 		return auth(user)
 	}
 
-	return models.User{}, fmt.Errorf("user does not exist")
+	return models.User{}, fmt.Errorf("User does not exist.")
 }
 
 // GetUserByUsername returns the specified user's model struct. It returns an error if the attempt rendered unsuccessful.
@@ -80,14 +80,14 @@ func GetUserByUsername(username string) (models.User, error) {
 
 	stmt, err := db.Prepare(queries.GetUserByUsername)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by username: %s", err.Error())
+		return models.User{}, fmt.Errorf("Could not prepare SQL statement to fetch user by username: %s.", err.Error())
 	}
 
 	var user models.User
 
 	err = stmt.QueryRow(username).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by username: %s", err.Error())
+		return models.User{}, fmt.Errorf("SQL query failed on retrieving user by username: %s.", err.Error())
 	}
 
 	return user, nil
@@ -99,14 +99,14 @@ func GetUserByEmail(email string) (models.User, error) {
 
 	stmt, err := db.Prepare(queries.GetUserByEmail)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by email: %s", err.Error())
+		return models.User{}, fmt.Errorf("Could not prepare SQL statement to fetch user by email: %s.", err.Error())
 	}
 
 	var user models.User
 
 	err = stmt.QueryRow(email).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by email: %s", err.Error())
+		return models.User{}, fmt.Errorf("SQL query failed on retrieving user by email: %s.", err.Error())
 	}
 
 	return user, nil
@@ -118,14 +118,14 @@ func GetUserByID(id int) (models.User, error) {
 
 	stmt, err := db.Prepare(queries.GetUserByID)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by id: %s", err.Error())
+		return models.User{}, fmt.Errorf("Could not prepare SQL statement to fetch user by ID: %s.", err.Error())
 	}
 
 	var user models.User
 
 	err = stmt.QueryRow(id).Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
-		return models.User{}, fmt.Errorf("ran into an error trying to fetch user by id: %s", err.Error())
+		return models.User{}, fmt.Errorf("SQL query failed on retrieving user by ID: %s.", err.Error())
 	}
 
 	return user, nil
@@ -137,14 +137,14 @@ func CheckUsernameExists(username string) (bool, error) {
 
 	stmt, err := db.Prepare(queries.CheckExistingUsername)
 	if err != nil {
-		return false, fmt.Errorf("ran into an error trying to verify if username exists: %s", err.Error())
+		return false, fmt.Errorf("Could not prepare SQL statement to check if username exists: %s.", err.Error())
 	}
 
 	var count int
 
 	err = stmt.QueryRow(username).Scan(&count)
 	if err != nil {
-		return false, fmt.Errorf("ran into an error trying to verify if username exists: %s", err.Error())
+		return false, fmt.Errorf("SQL query failed on checking if username exists: %s.", err.Error())
 	}
 
 	return count != 0, nil
@@ -156,14 +156,14 @@ func CheckEmailExists(email string) (bool, error) {
 
 	stmt, err := db.Prepare(queries.CheckExistingEmail)
 	if err != nil {
-		return false, fmt.Errorf("ran into an error trying to verify if email exists: %s", err.Error())
+		return false, fmt.Errorf("Could not prepare SQL statement to check if email exists: %s.", err.Error())
 	}
 
 	var count int
 
 	err = stmt.QueryRow(email).Scan(&count)
 	if err != nil {
-		return false, fmt.Errorf("ran into an error trying to verify if email exists: %s", err.Error())
+		return false, fmt.Errorf("SQL query failed on checking if email exists: %s.", err.Error())
 	}
 
 	return count != 0, nil

@@ -16,13 +16,16 @@ func GetTasks() ([]models.Task, error) {
 
 	res, err := db.Query(queries.GetAllTasks)
 	if err != nil {
-		return tasks, fmt.Errorf("ran into an error trying to retrieve all tasks: %s", err.Error())
+		return tasks, fmt.Errorf("SQL query failed on retrieving all tasks: %s.", err.Error())
 	}
 
 	for res.Next() {
 		var row models.Task
 
-		res.Scan(&row.ID, &row.Title, &row.Description, &row.Priority, &row.CreatedAt, &row.Completed)
+		err = res.Scan(&row.ID, &row.Title, &row.Description, &row.Priority, &row.CreatedAt, &row.Completed)
+		if err != nil {
+			return tasks, fmt.Errorf("Failed to scan task row: %s.", err.Error())
+		}
 
 		tasks = append(tasks, row)
 	}
@@ -34,13 +37,16 @@ func GetTasks() ([]models.Task, error) {
 func GetTaskByID(taskID int) (models.Task, error) {
 	db := config.GetDB()
 
-	rows := db.QueryRow(queries.GetTaskByID, taskID)
+	stmt, err := db.Prepare(queries.GetTaskByID)
+	if err != nil {
+		return models.Task{}, fmt.Errorf("Could not prepare SQL statement to fetch task by ID: %s.", err.Error())
+	}
 
 	var task models.Task
 
-	err := rows.Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.CreatedAt, &task.Completed)
+	err = stmt.QueryRow(taskID).Scan(&task.ID, &task.Title, &task.Description, &task.Priority, &task.CreatedAt, &task.Completed)
 	if err != nil {
-		return models.Task{}, fmt.Errorf("ran into an error trying to fetch task by ID: %s", err.Error())
+		return models.Task{}, fmt.Errorf("SQL query failed on retrieving task by ID: %s.", err.Error())
 	}
 
 	return task, nil
@@ -57,29 +63,29 @@ func AddTask(d interface{}) (models.Task, error) {
 	})
 
 	if !ok {
-		return models.Task{}, fmt.Errorf("could not process user input when trying to add task")
+		return models.Task{}, fmt.Errorf("Could not process user input.")
 	}
 
 	db := config.GetDB()
 
 	stmt, err := db.Prepare(queries.AddTask)
 	if err != nil {
-		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
+		return models.Task{}, fmt.Errorf("Could not prepare SQL statement to add a task: %s.", err.Error())
 	}
 
 	res, err := stmt.Exec(userInput.Title, userInput.Description, userInput.Priority, userInput.CreatedAt, userInput.Completed)
 	if err != nil {
-		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
+		return models.Task{}, fmt.Errorf("Could not execute statement to add a task: %s.", err.Error())
 	}
 
 	insertID, err := res.LastInsertId()
 	if err != nil {
-		return models.Task{}, fmt.Errorf("ran into an error trying to add a task: %s", err.Error())
+		return models.Task{}, fmt.Errorf("Could not retrieve insert ID: %s.", err.Error())
 	}
 
 	task, err := GetTaskByID(int(insertID))
 	if err != nil {
-		return models.Task{}, err
+		return models.Task{}, fmt.Errorf("Could not retrieve newly created task: %s.", err.Error())
 	}
 
 	return task, nil
@@ -96,24 +102,24 @@ func UpdateTask(ID int, d interface{}) (models.Task, error) {
 	})
 
 	if !ok {
-		return models.Task{}, fmt.Errorf("could not process user input when trying to add task")
+		return models.Task{}, fmt.Errorf("Could not process user input.")
 	}
 
 	db := config.GetDB()
 
 	stmt, err := db.Prepare(queries.UpdateTask)
 	if err != nil {
-		return models.Task{}, fmt.Errorf("ran into an error trying to update a task: %s", err.Error())
+		return models.Task{}, fmt.Errorf("Could not prepare SQL statement to update a task: %s.", err.Error())
 	}
 
 	_, err = stmt.Exec(ID, userInput.Title, userInput.Description, userInput.Priority, userInput.CreatedAt, userInput.Completed)
 	if err != nil {
-		return models.Task{}, fmt.Errorf("ran into an error trying to update a task: %s", err.Error())
+		return models.Task{}, fmt.Errorf("Could not execute statement to update a task: %s.", err.Error())
 	}
 
 	task, err := GetTaskByID(ID)
 	if err != nil {
-		return models.Task{}, err
+		return models.Task{}, fmt.Errorf("Could not retrieve updated task: %s.", err.Error())
 	}
 
 	return task, nil
@@ -124,15 +130,13 @@ func DeleteTask(task models.Task) error {
 	db := config.GetDB()
 
 	stmt, err := db.Prepare(queries.DeleteTask)
-
 	if err != nil {
-		return fmt.Errorf("ran into an error trying to delete a task: %s", err.Error())
+		return fmt.Errorf("Could not prepare SQL statement to delete a task: %s.", err.Error())
 	}
 
 	_, err = stmt.Exec(task.ID)
-
 	if err != nil {
-		return fmt.Errorf("ran into an error trying to delete a task: %s", err.Error())
+		return fmt.Errorf("Could not execute statement to delete a task: %s.", err.Error())
 	}
 
 	return nil
